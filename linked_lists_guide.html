@@ -1,0 +1,1923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linked Lists — Complete Interview Guide</title>
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --surface: #171717;
+    --surface2: #1e1e1e;
+    --surface3: #252525;
+    --border: #2a2a2a;
+    --border2: #333;
+    --text: #e8e8e8;
+    --muted: #888;
+    --dim: #555;
+    --accent: #4ade80;
+    --accent2: #22d3ee;
+    --accent3: #f59e0b;
+    --accent4: #f87171;
+    --accent5: #a78bfa;
+    --accent6: #fb923c;
+    --code-bg: #141414;
+    --tag-easy: #166534; --tag-easy-t: #4ade80;
+    --tag-med: #92400e; --tag-med-t: #fbbf24;
+    --tag-hard: #7f1d1d; --tag-hard-t: #f87171;
+    --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+    --font-sans: 'Inter', system-ui, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(15,15,15,0.96);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex; gap: 0; overflow-x: auto;
+    scrollbar-width: none;
+  }
+  nav::-webkit-scrollbar { display: none; }
+  nav a {
+    color: var(--muted); text-decoration: none;
+    padding: 14px 16px; font-size: 13px;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap; transition: color 0.15s;
+  }
+  nav a:hover { color: var(--text); }
+  nav a.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ── LAYOUT ── */
+  .page { max-width: 920px; margin: 0 auto; padding: 3rem 2rem 6rem; }
+
+  /* ── HERO ── */
+  .hero {
+    text-align: center; padding: 3rem 0 4rem;
+    border-bottom: 1px solid var(--border); margin-bottom: 4rem;
+  }
+  .hero-label {
+    display: inline-block;
+    font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--accent); border: 1px solid var(--accent);
+    padding: 4px 12px; border-radius: 20px; margin-bottom: 1.5rem;
+  }
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 700; line-height: 1.15;
+    background: linear-gradient(135deg, #fff 30%, #888);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+  }
+  .hero p { color: var(--muted); font-size: 16px; max-width: 560px; margin: 0 auto; }
+  .hero-tags { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 1.5rem; }
+  .hero-tag {
+    font-size: 12px; padding: 4px 10px; border-radius: 4px;
+    background: var(--surface2); color: var(--muted);
+    border: 1px solid var(--border);
+  }
+
+  /* ── SECTION ── */
+  .section { margin-bottom: 5rem; }
+  .section-header {
+    display: flex; align-items: center; gap: 1rem;
+    margin-bottom: 2.5rem; padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    font-size: 11px; font-family: var(--font-mono);
+    color: var(--accent); letter-spacing: 0.1em;
+  }
+  .section-header h2 {
+    font-size: 1.6rem; font-weight: 600; color: #fff;
+  }
+  h3 {
+    font-size: 1.1rem; font-weight: 600;
+    color: var(--accent2); margin: 2.5rem 0 1rem;
+    display: flex; align-items: center; gap: 8px;
+  }
+  h3::before { content: '//'; color: var(--dim); font-family: var(--font-mono); font-size: 0.85rem; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: var(--accent3); margin: 1.5rem 0 0.75rem; }
+
+  p { margin-bottom: 0.9rem; color: var(--text); }
+  strong { color: #fff; font-weight: 600; }
+  em { color: var(--accent3); font-style: normal; }
+
+  /* ── CODE ── */
+  pre {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 1.25rem 1.5rem;
+    overflow-x: auto; margin: 1.25rem 0;
+    font-family: var(--font-mono); font-size: 13px; line-height: 1.65;
+    position: relative;
+  }
+  pre .lang-label {
+    position: absolute; top: 8px; right: 12px;
+    font-size: 10px; color: var(--dim); letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  code { font-family: var(--font-mono); font-size: 0.88em; }
+  p code, li code {
+    background: var(--surface2); border: 1px solid var(--border);
+    padding: 1px 6px; border-radius: 3px; color: var(--accent2);
+  }
+  .kw { color: #c792ea; }
+  .type { color: #82aaff; }
+  .fn { color: #82cfff; }
+  .str { color: #c3e88d; }
+  .num { color: #f78c6c; }
+  .cmt { color: #546e7a; font-style: italic; }
+  .ann { color: #ffcb6b; }
+
+  /* ── CALLOUT ── */
+  .callout {
+    border-radius: 8px; padding: 1rem 1.25rem;
+    margin: 1.25rem 0; border-left: 3px solid;
+  }
+  .callout.info { background: #0c1a2e; border-color: var(--accent2); }
+  .callout.warn { background: #1c1400; border-color: var(--accent3); }
+  .callout.danger { background: #1c0808; border-color: var(--accent4); }
+  .callout.success { background: #071a0e; border-color: var(--accent); }
+  .callout-title { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.4rem; }
+  .callout.info .callout-title { color: var(--accent2); }
+  .callout.warn .callout-title { color: var(--accent3); }
+  .callout.danger .callout-title { color: var(--accent4); }
+  .callout.success .callout-title { color: var(--accent); }
+
+  /* ── LIST DIAGRAM ── */
+  .list-diagram {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 1.5rem; margin: 1.25rem 0;
+    font-family: var(--font-mono); font-size: 13px;
+    color: var(--accent2); line-height: 1.8; overflow-x: auto;
+  }
+  .list-diagram .node { color: var(--accent); font-weight: 600; }
+  .list-diagram .ptr { color: var(--dim); }
+  .list-diagram .null-node { color: var(--accent4); }
+
+  /* ── PATTERN CARD ── */
+  .pattern-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1rem; margin: 1.5rem 0;
+  }
+  .pattern-card {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.25rem;
+    transition: border-color 0.2s;
+  }
+  .pattern-card:hover { border-color: var(--border2); }
+  .pattern-card h4 { margin: 0 0 0.5rem; font-size: 0.9rem; color: var(--accent5); }
+  .pattern-card h4::before { display: none; }
+  .pattern-card p { font-size: 13px; color: var(--muted); margin: 0; }
+  .pattern-icon {
+    font-size: 20px; margin-bottom: 0.5rem; display: block;
+  }
+
+  /* ── COMPARISON TABLE ── */
+  .compare-table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: 13px; }
+  .compare-table th {
+    background: var(--surface2); color: var(--muted);
+    text-align: left; padding: 10px 14px;
+    border: 1px solid var(--border); font-weight: 500;
+    text-transform: uppercase; font-size: 11px; letter-spacing: 0.08em;
+  }
+  .compare-table td { padding: 10px 14px; border: 1px solid var(--border); vertical-align: top; }
+  .compare-table tr:nth-child(even) td { background: var(--surface); }
+  .compare-table .yes { color: var(--accent); }
+  .compare-table .no { color: var(--accent4); }
+  .compare-table .mid { color: var(--accent3); }
+
+  /* ── PROBLEM LIST ── */
+  .problem-section-label {
+    font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--muted); margin: 2.5rem 0 1rem;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .problem-section-label::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+  .problem-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.1rem 1.3rem;
+    margin-bottom: 0.75rem; display: grid;
+    grid-template-columns: auto 1fr; gap: 0.75rem 1rem;
+    align-items: start; transition: border-color 0.2s;
+  }
+  .problem-card:hover { border-color: var(--border2); }
+  .problem-num {
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--dim); padding-top: 2px;
+  }
+  .problem-main { }
+  .problem-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
+  .problem-name { font-weight: 600; font-size: 14px; color: #fff; }
+  .problem-name a { color: inherit; text-decoration: none; }
+  .problem-name a:hover { color: var(--accent2); }
+  .badge {
+    font-size: 10px; font-weight: 600; padding: 2px 7px;
+    border-radius: 3px; letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .badge.easy { background: var(--tag-easy); color: var(--tag-easy-t); }
+  .badge.medium { background: var(--tag-med); color: var(--tag-med-t); }
+  .badge.hard { background: var(--tag-hard); color: var(--tag-hard-t); }
+  .badge.pattern { background: var(--surface3); color: var(--accent5); border: 1px solid #3a2d6a; }
+  .problem-hint { font-size: 13px; color: var(--muted); margin: 4px 0; }
+  .problem-tricky { font-size: 12px; color: var(--accent3); }
+  .problem-tricky::before { content: '⚡ '; }
+
+  /* ── DRY RUN ── */
+  .dry-run {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden; margin: 1.5rem 0;
+  }
+  .dry-run-header {
+    background: var(--surface2); padding: 0.75rem 1.25rem;
+    font-size: 12px; color: var(--muted); border-bottom: 1px solid var(--border);
+    font-family: var(--font-mono);
+  }
+  .dry-run-body { padding: 1.25rem; }
+  .step {
+    display: grid; grid-template-columns: 28px 1fr;
+    gap: 0.75rem; margin-bottom: 1rem; align-items: start;
+  }
+  .step:last-child { margin-bottom: 0; }
+  .step-n {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--surface3); color: var(--accent);
+    font-size: 11px; font-family: var(--font-mono); font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .step-text { font-size: 13px; color: var(--text); padding-top: 3px; }
+  .step-text code { background: var(--code-bg); padding: 1px 5px; border-radius: 3px; color: var(--accent2); }
+
+  /* ── EDGE CASE LIST ── */
+  .edge-case {
+    display: flex; gap: 10px; margin-bottom: 0.75rem;
+    align-items: flex-start;
+  }
+  .edge-icon {
+    color: var(--accent4); font-family: var(--font-mono); font-size: 12px;
+    padding-top: 2px; flex-shrink: 0; width: 20px;
+  }
+  .edge-text { font-size: 14px; }
+  .edge-text strong { color: var(--accent4); }
+
+  ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+  li { margin-bottom: 0.4rem; font-size: 14px; }
+
+  /* ── TRAVERSAL STRIP ── */
+  .traversal-strip {
+    display: flex; gap: 6px; flex-wrap: wrap; margin: 0.75rem 0;
+  }
+  .tnode {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 14px;
+    font-family: var(--font-mono); font-size: 14px; font-weight: 600;
+  }
+  .tnode.active { background: #0f2d1a; border-color: var(--accent); color: var(--accent); }
+  .tarrow { color: var(--dim); align-self: center; font-family: var(--font-mono); }
+
+  .section-divider {
+    border: none; border-top: 1px solid var(--border); margin: 4rem 0;
+  }
+
+  @media (max-width: 640px) {
+    .page { padding: 1.5rem 1rem 4rem; }
+    nav a { padding: 12px 10px; font-size: 12px; }
+    .hero h1 { font-size: 1.8rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#part1" class="active">Part 1 · Fundamentals</a>
+  <a href="#part2">Part 2 · Pointers</a>
+  <a href="#part3">Part 3 · Operations</a>
+  <a href="#part4">Part 4 · Patterns</a>
+  <a href="#templates">Templates</a>
+  <a href="#edge">Edge Cases</a>
+  <a href="#compare">Comparison</a>
+  <a href="#problems">Problems</a>
+</nav>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <span class="hero-label">DSA Interview Mastery</span>
+    <h1>Linked Lists</h1>
+    <p>A structured, deep dive into pointer thinking — reversal mechanics, fast &amp; slow patterns, and 38 curated interview problems.</p>
+    <div class="hero-tags">
+      <span class="hero-tag">Singly Linked List</span>
+      <span class="hero-tag">Doubly Linked List</span>
+      <span class="hero-tag">Circular List</span>
+      <span class="hero-tag">Pointer Patterns</span>
+      <span class="hero-tag">Java Templates</span>
+      <span class="hero-tag">38 Problems</span>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       PART 1: FUNDAMENTALS
+  ═══════════════════════════════════════════════ -->
+  <div class="section" id="part1">
+    <div class="section-header">
+      <span class="section-num">PART 01</span>
+      <h2>Fundamentals</h2>
+    </div>
+
+    <h3>Core Intuition — Why Do Linked Lists Exist?</h3>
+    <p>
+      Arrays are stored in <strong>contiguous memory</strong>. This is their superpower (O(1) random access via index) and their curse (insertion/deletion in the middle requires shifting every subsequent element — O(n)).
+    </p>
+    <p>
+      Linked lists trade random access for <strong>flexible insertion and deletion</strong>. Each node lives wherever in memory, connected to the next by a pointer. To insert between two nodes, you just rewire two pointers — O(1). No shifting. No reallocation.
+    </p>
+
+    <div class="callout info">
+      <div class="callout-title">Mental Model</div>
+      Think of an array as a row of numbered seats in a cinema — fixed positions, you can jump to seat 42 instantly, but inserting a new seat forces everyone to shuffle. A linked list is a treasure hunt — each clue (node) tells you where the next clue is. You can insert a new clue anywhere by just changing two references, but to get to clue 42, you must follow all 41 before it.
+    </div>
+
+    <h4>Trade-off Summary</h4>
+    <table class="compare-table">
+      <tr>
+        <th>Operation</th>
+        <th>Array</th>
+        <th>Linked List</th>
+      </tr>
+      <tr>
+        <td><strong>Access by index</strong></td>
+        <td class="yes">O(1)</td>
+        <td class="no">O(n)</td>
+      </tr>
+      <tr>
+        <td><strong>Search</strong></td>
+        <td class="mid">O(n)</td>
+        <td class="mid">O(n)</td>
+      </tr>
+      <tr>
+        <td><strong>Insert at beginning</strong></td>
+        <td class="no">O(n) — shift all</td>
+        <td class="yes">O(1)</td>
+      </tr>
+      <tr>
+        <td><strong>Insert at end</strong></td>
+        <td class="yes">O(1) amortized</td>
+        <td class="mid">O(1) with tail pointer, else O(n)</td>
+      </tr>
+      <tr>
+        <td><strong>Insert in middle</strong></td>
+        <td class="no">O(n)</td>
+        <td class="yes">O(1) given a pointer to that node</td>
+      </tr>
+      <tr>
+        <td><strong>Delete</strong></td>
+        <td class="no">O(n)</td>
+        <td class="yes">O(1) given pointer to prev node</td>
+      </tr>
+      <tr>
+        <td><strong>Memory</strong></td>
+        <td class="yes">Compact — values only</td>
+        <td class="no">Extra pointer(s) per node</td>
+      </tr>
+      <tr>
+        <td><strong>Cache friendliness</strong></td>
+        <td class="yes">High — contiguous memory</td>
+        <td class="no">Low — nodes scattered in heap</td>
+      </tr>
+    </table>
+
+    <div class="callout warn">
+      <div class="callout-title">Key Mental Shift</div>
+      In arrays, you think about <em>indices</em>. In linked lists, you think about <em>pointers</em>. The index is replaced by a reference to the next node. "Moving forward" means following a pointer, not incrementing an index. This is the mental model you must internalize before solving any linked list problem.
+    </div>
+
+    <h3>Types of Linked Lists</h3>
+
+    <h4>1. Singly Linked List</h4>
+    <p>Each node holds a value and a single pointer to the <strong>next</strong> node. The last node points to <code>null</code>.</p>
+    <div class="list-diagram">
+<span class="node">[1]</span> <span class="ptr">──next──▶</span> <span class="node">[2]</span> <span class="ptr">──next──▶</span> <span class="node">[3]</span> <span class="ptr">──next──▶</span> <span class="node">[4]</span> <span class="ptr">──next──▶</span> <span class="null-node">null</span>
+
+ head                                          tail
+    </div>
+    <p><strong>When to use:</strong> The default choice. Simple queues, stacks, most interview problems. Use when you only need forward traversal.</p>
+    <ul>
+      <li>Forward traversal only.</li>
+      <li>To delete a node, you need a reference to its <em>previous</em> node.</li>
+      <li>Most LeetCode linked list problems use singly linked lists.</li>
+    </ul>
+
+    <h4>2. Doubly Linked List</h4>
+    <p>Each node holds a value, a pointer to the <strong>next</strong> node, and a pointer to the <strong>previous</strong> node.</p>
+    <div class="list-diagram">
+<span class="null-node">null</span> <span class="ptr">◀──prev──</span> <span class="node">[1]</span> <span class="ptr">⟺</span> <span class="node">[2]</span> <span class="ptr">⟺</span> <span class="node">[3]</span> <span class="ptr">⟺</span> <span class="node">[4]</span> <span class="ptr">──next──▶</span> <span class="null-node">null</span>
+
+Each node: prev ◀── [val] ──▶ next
+    </div>
+    <p><strong>When to use:</strong> When you need bidirectional traversal. LRU Cache (delete a node in O(1) without searching for its predecessor). Browser history (back and forward). Text editors (cursor movement). Java's <code>LinkedList</code> class is doubly linked internally.</p>
+    <ul>
+      <li>Can traverse forward and backward.</li>
+      <li>Can delete any node in O(1) given only a pointer to that node (use <code>node.prev</code>).</li>
+      <li>Uses 2x the pointer memory compared to singly.</li>
+    </ul>
+
+    <h4>3. Circular Linked List</h4>
+    <p>The last node's <code>next</code> pointer points back to the <strong>head</strong> (or any earlier node) instead of null. Can be singly or doubly circular.</p>
+    <div class="list-diagram">
+<span class="ptr">┌─────────────────────────────────────────┐</span>
+<span class="ptr">▼                                         │</span>
+<span class="node">[1]</span> <span class="ptr">──▶</span> <span class="node">[2]</span> <span class="ptr">──▶</span> <span class="node">[3]</span> <span class="ptr">──▶</span> <span class="node">[4]</span> <span class="ptr">──next──┘</span>
+    </div>
+    <p><strong>When to use:</strong> Round-robin scheduling (processes taking turns), music playlists that loop, multiplayer games (each player's turn cycles). Detecting cycles with Floyd's algorithm is fundamentally about recognizing circular behavior.</p>
+    <ul>
+      <li>No natural <code>null</code> terminator — traversal must stop based on a condition (e.g., returning to head).</li>
+      <li>Can start traversal from any node.</li>
+      <li>Infinite loop risk if you forget the stopping condition.</li>
+    </ul>
+
+    <h4>Difference Summary</h4>
+    <table class="compare-table">
+      <tr>
+        <th>Property</th>
+        <th>Singly</th>
+        <th>Doubly</th>
+        <th>Circular</th>
+      </tr>
+      <tr>
+        <td><strong>Pointers per node</strong></td>
+        <td>1 (next)</td>
+        <td>2 (prev + next)</td>
+        <td>1 or 2 (wraps)</td>
+      </tr>
+      <tr>
+        <td><strong>Traversal direction</strong></td>
+        <td class="mid">Forward only</td>
+        <td class="yes">Both directions</td>
+        <td class="mid">Forward, loops</td>
+      </tr>
+      <tr>
+        <td><strong>Delete given only node ref</strong></td>
+        <td class="no">Need prev node</td>
+        <td class="yes">O(1) — use node.prev</td>
+        <td class="mid">Depends on type</td>
+      </tr>
+      <tr>
+        <td><strong>Tail points to</strong></td>
+        <td>null</td>
+        <td>null</td>
+        <td class="yes">head (or any node)</td>
+      </tr>
+      <tr>
+        <td><strong>Cycle detection risk</strong></td>
+        <td class="yes">No (if correct)</td>
+        <td class="yes">No (if correct)</td>
+        <td class="no">Always "cyclic"</td>
+      </tr>
+      <tr>
+        <td><strong>Real-world use</strong></td>
+        <td>Stacks, queues, most DSA</td>
+        <td>LRU Cache, browsers</td>
+        <td>Schedulers, games</td>
+      </tr>
+    </table>
+
+  </div><!-- /part1 -->
+  <hr class="section-divider">
+
+
+  <!-- ═══════════════════════════════════════════════
+       PART 2: POINTER TECHNIQUES
+  ═══════════════════════════════════════════════ -->
+  <div class="section" id="part2">
+    <div class="section-header">
+      <span class="section-num">PART 02</span>
+      <h2>Pointer Techniques — The Heart of Linked Lists</h2>
+    </div>
+
+    <p>
+      This is the most critical section. Linked list problems are <strong>95% pointer manipulation</strong>. You are not processing values — you are rewiring connections between nodes. Master this, and almost every linked list problem becomes straightforward.
+    </p>
+
+    <h3>Pattern 1 — Traversal</h3>
+    <p>The foundation. Moving from head to tail by following <code>next</code> pointers.</p>
+
+<pre><code><span class="type">ListNode</span> curr = head;
+<span class="kw">while</span> (curr != <span class="kw">null</span>) {
+    <span class="cmt">// process curr.val here</span>
+    curr = curr.next; <span class="cmt">// advance: follow the pointer</span>
+}
+<span class="cmt">// After loop: curr == null, you have reached the end</span></code></pre>
+
+    <div class="callout warn">
+      <div class="callout-title">Critical Mistake</div>
+      <code>while (curr.next != null)</code> stops ONE node early (at the last node). <code>while (curr != null)</code> processes every node including the last. Know which you need. For finding the tail node, you want <code>while (curr.next != null)</code>. For processing all values, use <code>while (curr != null)</code>.
+    </div>
+
+    <h3>Pattern 2 — Reversal (The Most Asked Pattern)</h3>
+    <p>
+      Reversing a linked list requires tracking three pointers simultaneously: <code>prev</code>, <code>curr</code>, and <code>next</code>. The operation is: for each node, make it point <em>backward</em> instead of forward.
+    </p>
+
+    <div class="callout info">
+      <div class="callout-title">Mental Model — "Breaking and Reconnecting Links"</div>
+      Imagine each arrow between nodes is a physical wire. To reverse, you snip the wire pointing forward and reconnect it to point backward. But before snipping, you must save where the forward wire was going — otherwise you lose the rest of the list. This "save before modify" discipline is the entire reversal pattern.
+    </div>
+
+    <div class="dry-run">
+      <div class="dry-run-header">// Dry Run — Reversing: 1 → 2 → 3 → 4 → null</div>
+      <div class="dry-run-body">
+        <div class="step">
+          <div class="step-n">0</div>
+          <div class="step-text"><strong>Initial state:</strong> <code>prev = null</code>, <code>curr = [1]</code>. The list is 1→2→3→4→null. We want null←1←2←3←4.</div>
+        </div>
+        <div class="step">
+          <div class="step-n">1</div>
+          <div class="step-text"><strong>Iteration 1:</strong> Save <code>next = curr.next</code> = [2]. Set <code>curr.next = prev</code> = null (node 1 now points backward to null). Advance: <code>prev = curr</code> = [1], <code>curr = next</code> = [2]. State: null ← [1], curr=[2].</div>
+        </div>
+        <div class="step">
+          <div class="step-n">2</div>
+          <div class="step-text"><strong>Iteration 2:</strong> Save <code>next = curr.next</code> = [3]. Set <code>curr.next = prev</code> = [1] (node 2 now points to node 1). Advance: <code>prev = [2]</code>, <code>curr = [3]</code>. State: null ← [1] ← [2], curr=[3].</div>
+        </div>
+        <div class="step">
+          <div class="step-n">3</div>
+          <div class="step-text"><strong>Iteration 3:</strong> Save <code>next = [4]</code>. Set <code>[3].next = [2]</code>. Advance: <code>prev = [3]</code>, <code>curr = [4]</code>. State: null ← [1] ← [2] ← [3], curr=[4].</div>
+        </div>
+        <div class="step">
+          <div class="step-n">4</div>
+          <div class="step-text"><strong>Iteration 4:</strong> Save <code>next = null</code>. Set <code>[4].next = [3]</code>. Advance: <code>prev = [4]</code>, <code>curr = null</code>. Loop ends. Return <code>prev</code> = [4] as the new head. Result: null ← 1 ← 2 ← 3 ← 4, read as 4→3→2→1→null. ✓</div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Pattern 3 — Fast &amp; Slow Pointers (Floyd's Algorithm)</h3>
+    <p>
+      Two pointers start at head. <code>slow</code> moves one step at a time. <code>fast</code> moves two steps at a time. This pattern exploits the <strong>speed differential</strong> to detect cycles, find the middle, and locate the Nth node from the end.
+    </p>
+
+    <div class="callout info">
+      <div class="callout-title">Mental Model — "The Track Runner"</div>
+      Imagine two runners on a circular track. The faster one laps the slower one — they meet. On a straight track, the fast runner reaches the end when the slow runner is at the midpoint. This is the core intuition behind every fast &amp; slow pointer problem.
+    </div>
+
+<pre><code><span class="type">ListNode</span> slow = head;
+<span class="type">ListNode</span> fast = head;
+
+<span class="kw">while</span> (fast != <span class="kw">null</span> &amp;&amp; fast.next != <span class="kw">null</span>) {
+    slow = slow.next;       <span class="cmt">// 1 step</span>
+    fast = fast.next.next;  <span class="cmt">// 2 steps</span>
+}
+<span class="cmt">// For a list of length n:</span>
+<span class="cmt">// - No cycle: fast reaches null, slow is at the middle node</span>
+<span class="cmt">// - Cycle: fast and slow will eventually meet inside the cycle</span></code></pre>
+
+    <div class="callout danger">
+      <div class="callout-title">Critical: Always check fast AND fast.next</div>
+      The condition must be <code>fast != null &amp;&amp; fast.next != null</code>. If you only check <code>fast != null</code>, then <code>fast.next.next</code> will throw a <code>NullPointerException</code> when <code>fast</code> is at the last node. Both checks are mandatory.
+    </div>
+
+    <h3>Pattern 4 — Dummy Node Technique</h3>
+    <p>
+      Create a fake "dummy" node before the real head. Point its <code>next</code> to the actual head. Operate on the list. Return <code>dummy.next</code> as the new head.
+    </p>
+    <p>
+      <strong>Why?</strong> Without a dummy node, inserting before the head, or deleting the head node, requires special-case logic. With a dummy node, the head is just another node — no special cases. This simplifies code dramatically.
+    </p>
+
+<pre><code><span class="type">ListNode</span> dummy = <span class="kw">new</span> <span class="type">ListNode</span>(<span class="num">0</span>); <span class="cmt">// dummy.val doesn't matter</span>
+dummy.next = head;               <span class="cmt">// link dummy before the real list</span>
+
+<span class="type">ListNode</span> curr = dummy;           <span class="cmt">// operate using curr</span>
+<span class="cmt">// ... perform operations ...</span>
+
+<span class="kw">return</span> dummy.next; <span class="cmt">// new head (may differ from original head)</span></code></pre>
+
+    <div class="callout success">
+      <div class="callout-title">When to Always Use Dummy Node</div>
+      Merge two sorted lists, remove Nth from end, delete a node by value, partition list, add two numbers. Essentially: whenever the head might change, or when you need a "previous" pointer at the very start of the list.
+    </div>
+
+    <h3>Mental Models — "Tracking Previous, Current, Next"</h3>
+    <p>
+      Before ANY pointer reassignment in a linked list, ask yourself three questions:
+    </p>
+    <ol>
+      <li><strong>What am I about to overwrite?</strong> — Save it in a temp variable first.</li>
+      <li><strong>What should this pointer now point to?</strong> — Make the assignment.</li>
+      <li><strong>How do I advance to the next node?</strong> — Use the saved reference.</li>
+    </ol>
+    <p>
+      This "save → reassign → advance" discipline eliminates 90% of linked list bugs. Never reassign a pointer until you've saved where it was going.
+    </p>
+
+    <h3>Common Mistakes — What Breaks Logic</h3>
+
+    <div class="edge-case">
+      <div class="edge-icon">!</div>
+      <div class="edge-text"><strong>Losing reference to next before saving.</strong> The most common bug. If you do <code>curr.next = prev</code> before saving <code>next = curr.next</code>, you have permanently lost the rest of the list. The order is always: save first, then modify.</div>
+    </div>
+
+    <div class="edge-case">
+      <div class="edge-icon">!</div>
+      <div class="edge-text"><strong>Null pointer errors.</strong> Accessing <code>curr.next</code> when <code>curr</code> is null. Accessing <code>fast.next.next</code> when <code>fast.next</code> is null. Always guard pointer dereferences with null checks.</div>
+    </div>
+
+    <div class="edge-case">
+      <div class="edge-icon">!</div>
+      <div class="edge-text"><strong>Incorrect head update.</strong> After reversal or structural changes, failing to return the correct new head. In reversal, the new head is <code>prev</code> (not <code>curr</code>, which is null). Always trace through where head ends up.</div>
+    </div>
+
+    <div class="edge-case">
+      <div class="edge-icon">!</div>
+      <div class="edge-text"><strong>Creating an unintended cycle.</strong> When linking the tail of one sublist to the head of another, if you forget to set the tail's <code>next</code> to null, you may accidentally create a cycle. Always null-terminate modified sublists.</div>
+    </div>
+
+    <div class="edge-case">
+      <div class="edge-icon">!</div>
+      <div class="edge-text"><strong>Off-by-one in N-from-end problems.</strong> If you move <code>fast</code> N steps ahead and then move both until fast reaches null vs. the last node — these differ by 1. Dry run edge cases with small lists (n=1, n=length).</div>
+    </div>
+
+  </div><!-- /part2 -->
+  <hr class="section-divider">
+
+
+  <!-- ═══════════════════════════════════════════════
+       PART 3: CORE OPERATIONS
+  ═══════════════════════════════════════════════ -->
+  <div class="section" id="part3">
+    <div class="section-header">
+      <span class="section-num">PART 03</span>
+      <h2>Core Operations — Intuition + Dry Run</h2>
+    </div>
+
+    <h3>Insert — At Beginning (O(1))</h3>
+    <p>Create a new node. Point its <code>next</code> to the current head. Update head to the new node.</p>
+
+<pre><code><span class="kw">void</span> <span class="fn">insertAtBeginning</span>(<span class="kw">int</span> val) {
+    <span class="type">ListNode</span> newNode = <span class="kw">new</span> <span class="type">ListNode</span>(val);
+    newNode.next = head; <span class="cmt">// new node points to old head</span>
+    head = newNode;      <span class="cmt">// update head to new node</span>
+}
+<span class="cmt">// Order matters: if you set head = newNode FIRST,</span>
+<span class="cmt">// you lose the reference to the old head — newNode.next becomes null.</span></code></pre>
+
+    <div class="dry-run">
+      <div class="dry-run-header">// Insert 0 at beginning of: 1 → 2 → 3</div>
+      <div class="dry-run-body">
+        <div class="step"><div class="step-n">1</div><div class="step-text">Create <code>newNode = [0]</code>. List: [0], head=[1]→[2]→[3].</div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-text">Set <code>newNode.next = head</code>. Now [0]→[1]→[2]→[3]. head still = [1].</div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-text">Set <code>head = newNode</code>. Now head=[0]→[1]→[2]→[3]. ✓</div></div>
+      </div>
+    </div>
+
+    <h3>Insert — At End (O(n) without tail pointer)</h3>
+    <p>Traverse to the last node (where <code>curr.next == null</code>). Link the new node after it.</p>
+
+<pre><code><span class="kw">void</span> <span class="fn">insertAtEnd</span>(<span class="kw">int</span> val) {
+    <span class="type">ListNode</span> newNode = <span class="kw">new</span> <span class="type">ListNode</span>(val);
+    <span class="kw">if</span> (head == <span class="kw">null</span>) { head = newNode; <span class="kw">return</span>; } <span class="cmt">// empty list edge case</span>
+
+    <span class="type">ListNode</span> curr = head;
+    <span class="kw">while</span> (curr.next != <span class="kw">null</span>) { <span class="cmt">// stop at last node (not null!)</span>
+        curr = curr.next;
+    }
+    curr.next = newNode; <span class="cmt">// link new node after last</span>
+}</code></pre>
+
+    <h3>Insert — At Middle (Given Position)</h3>
+    <p>Traverse to the node <em>before</em> the target position. Rewire two pointers.</p>
+
+<pre><code><span class="kw">void</span> <span class="fn">insertAtPosition</span>(<span class="kw">int</span> pos, <span class="kw">int</span> val) {
+    <span class="kw">if</span> (pos == <span class="num">0</span>) { <span class="fn">insertAtBeginning</span>(val); <span class="kw">return</span>; }
+
+    <span class="type">ListNode</span> newNode = <span class="kw">new</span> <span class="type">ListNode</span>(val);
+    <span class="type">ListNode</span> curr = head;
+
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; pos - <span class="num">1</span> &amp;&amp; curr != <span class="kw">null</span>; i++) {
+        curr = curr.next; <span class="cmt">// stop at node BEFORE insertion point</span>
+    }
+    <span class="kw">if</span> (curr == <span class="kw">null</span>) <span class="kw">return</span>; <span class="cmt">// position out of range</span>
+
+    newNode.next = curr.next; <span class="cmt">// step 1: new node points to successor</span>
+    curr.next = newNode;      <span class="cmt">// step 2: predecessor points to new node</span>
+    <span class="cmt">// NEVER swap these two lines — you'd lose the successor reference</span>
+}
+</code></pre>
+
+    <div class="callout danger">
+      <div class="callout-title">Order Is Everything</div>
+      In middle insertion: always set <code>newNode.next = curr.next</code> BEFORE <code>curr.next = newNode</code>. If you do it backward, <code>curr.next</code> (the successor) is overwritten first, and you lose the rest of the list.
+    </div>
+
+    <h3>Delete — By Value</h3>
+    <p>Track the previous node. When you find the node with target value, skip it by linking previous directly to the node after it.</p>
+
+<pre><code><span class="type">ListNode</span> <span class="fn">deleteByValue</span>(<span class="type">ListNode</span> head, <span class="kw">int</span> val) {
+    <span class="type">ListNode</span> dummy = <span class="kw">new</span> <span class="type">ListNode</span>(<span class="num">0</span>);
+    dummy.next = head;
+    <span class="type">ListNode</span> prev = dummy;
+
+    <span class="kw">while</span> (prev.next != <span class="kw">null</span>) {
+        <span class="kw">if</span> (prev.next.val == val) {
+            prev.next = prev.next.next; <span class="cmt">// skip the target node</span>
+            <span class="cmt">// do NOT advance prev — there may be another duplicate</span>
+        } <span class="kw">else</span> {
+            prev = prev.next; <span class="cmt">// only advance if no deletion</span>
+        }
+    }
+    <span class="kw">return</span> dummy.next;
+}</code></pre>
+
+    <div class="dry-run">
+      <div class="dry-run-header">// Delete value 3 from: 1 → 3 → 3 → 4</div>
+      <div class="dry-run-body">
+        <div class="step"><div class="step-n">1</div><div class="step-text">dummy→[1]→[3]→[3]→[4]. <code>prev=dummy</code>. <code>prev.next=[1]</code>, val≠3, advance. <code>prev=[1]</code>.</div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-text"><code>prev.next=[3]</code>, val==3. Set <code>prev.next = [3].next = [3]</code> (second 3). Do NOT advance prev. <code>prev=[1]</code>.</div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-text"><code>prev.next=[3]</code> (second), val==3. Set <code>prev.next = [3].next = [4]</code>. Do NOT advance.</div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-text"><code>prev.next=[4]</code>, val≠3, advance. <code>prev=[4]</code>. Loop ends. Return dummy.next = [1]→[4]. ✓</div></div>
+      </div>
+    </div>
+
+    <h3>Delete — By Position (Remove Nth from End)</h3>
+    <p>Use the fast &amp; slow pointer gap trick: advance <code>fast</code> N steps ahead, then move both until <code>fast.next == null</code>. <code>slow</code> is now at the node before the target.</p>
+
+<pre><code><span class="type">ListNode</span> <span class="fn">removeNthFromEnd</span>(<span class="type">ListNode</span> head, <span class="kw">int</span> n) {
+    <span class="type">ListNode</span> dummy = <span class="kw">new</span> <span class="type">ListNode</span>(<span class="num">0</span>);
+    dummy.next = head;
+    <span class="type">ListNode</span> fast = dummy, slow = dummy;
+
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt;= n; i++) { <span class="cmt">// advance fast by n+1 steps</span>
+        fast = fast.next;
+    }
+    <span class="kw">while</span> (fast != <span class="kw">null</span>) {  <span class="cmt">// move both until fast reaches end</span>
+        slow = slow.next;
+        fast = fast.next;
+    }
+    slow.next = slow.next.next; <span class="cmt">// skip the Nth-from-end node</span>
+    <span class="kw">return</span> dummy.next;
+}</code></pre>
+
+    <h3>Search</h3>
+    <p>Linear traversal — O(n). No shortcuts in an unsorted list.</p>
+
+<pre><code><span class="type">ListNode</span> <span class="fn">search</span>(<span class="type">ListNode</span> head, <span class="kw">int</span> target) {
+    <span class="type">ListNode</span> curr = head;
+    <span class="kw">while</span> (curr != <span class="kw">null</span>) {
+        <span class="kw">if</span> (curr.val == target) <span class="kw">return</span> curr; <span class="cmt">// found</span>
+        curr = curr.next;
+    }
+    <span class="kw">return</span> <span class="kw">null</span>; <span class="cmt">// not found</span>
+}</code></pre>
+
+    <h3>Reverse — Iterative</h3>
+    <p>Three pointers: <code>prev</code>, <code>curr</code>, <code>next</code>. For each node: save next, flip the link, advance. Time: O(n). Space: O(1).</p>
+
+<pre><code><span class="type">ListNode</span> <span class="fn">reverseIterative</span>(<span class="type">ListNode</span> head) {
+    <span class="type">ListNode</span> prev = <span class="kw">null</span>;
+    <span class="type">ListNode</span> curr = head;
+
+    <span class="kw">while</span> (curr != <span class="kw">null</span>) {
+        <span class="type">ListNode</span> next = curr.next; <span class="cmt">// ① SAVE: preserve reference forward</span>
+        curr.next = prev;          <span class="cmt">// ② FLIP: point current node backward</span>
+        prev = curr;               <span class="cmt">// ③ ADVANCE prev</span>
+        curr = next;               <span class="cmt">// ④ ADVANCE curr using saved reference</span>
+    }
+    <span class="kw">return</span> prev; <span class="cmt">// prev is the new head (curr is null)</span>
+}
+<span class="cmt">// Common mistake: returning curr (which is null) instead of prev.</span></code></pre>
+
+    <h3>Reverse — Recursive</h3>
+    <p>Recurse to the end of the list. As the call stack unwinds, reverse each link. The new head is the last node found during the recursion.</p>
+
+<pre><code><span class="type">ListNode</span> <span class="fn">reverseRecursive</span>(<span class="type">ListNode</span> head) {
+    <span class="cmt">// Base: empty or single node — already reversed</span>
+    <span class="kw">if</span> (head == <span class="kw">null</span> || head.next == <span class="kw">null</span>) <span class="kw">return</span> head;
+
+    <span class="cmt">// Recurse: reverse the rest of the list first</span>
+    <span class="type">ListNode</span> newHead = <span class="fn">reverseRecursive</span>(head.next);
+
+    <span class="cmt">// Now head.next still points forward. Reverse it:</span>
+    head.next.next = head; <span class="cmt">// the next node now points back to head</span>
+    head.next = <span class="kw">null</span>;     <span class="cmt">// sever head's forward link</span>
+
+    <span class="kw">return</span> newHead; <span class="cmt">// bubble the new head all the way up</span>
+}
+<span class="cmt">// Space: O(n) call stack. Use iterative for large lists.</span>
+<span class="cmt">// Key insight: head.next.next = head flips the last remaining link at each frame.</span></code></pre>
+
+    <div class="callout info">
+      <div class="callout-title">Iterative vs Recursive Reversal</div>
+      Both are O(n) time. Iterative is O(1) space. Recursive uses O(n) stack space. In interviews, know both — but prefer iterative unless asked for recursive. The recursive version is elegant for understanding, but dangerous on very long lists (stack overflow).
+    </div>
+
+  </div><!-- /part3 -->
+  <hr class="section-divider">
+
+
+  <!-- ═══════════════════════════════════════════════
+       PART 4: ADVANCED PATTERNS
+  ═══════════════════════════════════════════════ -->
+  <div class="section" id="part4">
+    <div class="section-header">
+      <span class="section-num">PART 04</span>
+      <h2>Advanced Patterns</h2>
+    </div>
+
+    <p>Every linked list interview problem maps to one (or a combination) of these seven patterns. Recognize the pattern, apply the template, adapt.</p>
+
+    <div class="pattern-grid">
+      <div class="pattern-card">
+        <h4>A · Full &amp; Partial Reversal</h4>
+        <p>Reverse the entire list or a subrange [left, right]. Requires careful boundary handling and often a dummy node.</p>
+      </div>
+      <div class="pattern-card">
+        <h4>B · Fast &amp; Slow Pointer</h4>
+        <p>Speed differential to find cycles, midpoints, and Nth-from-end nodes. The most versatile linked list technique.</p>
+      </div>
+      <div class="pattern-card">
+        <h4>C · Merge / Two-Pointer</h4>
+        <p>Merge two sorted lists, merge K lists, or use two pointers moving in tandem across two separate lists.</p>
+      </div>
+      <div class="pattern-card">
+        <h4>D · Palindrome Check</h4>
+        <p>Find middle, reverse second half, compare. Classic compound problem combining multiple patterns.</p>
+      </div>
+      <div class="pattern-card">
+        <h4>E · Reorder / Restructure</h4>
+        <p>Interleave, zip, or reorder nodes without creating new nodes. Pointer rearrangement under constraints.</p>
+      </div>
+      <div class="pattern-card">
+        <h4>F · Intersection</h4>
+        <p>Find where two lists merge. Use length difference or the two-pointer cycling trick to align starts.</p>
+      </div>
+      <div class="pattern-card">
+        <h4>G · K-way Operations</h4>
+        <p>Reverse in K-groups, merge K sorted lists. Generalizes reversal and merge with a loop or heap.</p>
+      </div>
+    </div>
+
+    <h3>A — Reverse Linked List (Full &amp; Partial)</h3>
+
+    <h4>Full Reversal</h4>
+    <p>Standard three-pointer iterative approach. Covered in detail in Part 3. Time: O(n), Space: O(1). New head is <code>prev</code> after the loop.</p>
+
+    <h4>Partial Reversal (Reverse between positions left and right)</h4>
+    <p>This is significantly harder. You must locate the node just before position <code>left</code>, reverse exactly <code>(right - left + 1)</code> nodes, then reconnect the reversed segment back into the list.</p>
+
+<pre><code><span class="type">ListNode</span> <span class="fn">reverseBetween</span>(<span class="type">ListNode</span> head, <span class="kw">int</span> left, <span class="kw">int</span> right) {
+    <span class="type">ListNode</span> dummy = <span class="kw">new</span> <span class="type">ListNode</span>(<span class="num">0</span>);
+    dummy.next = head;
+    <span class="type">ListNode</span> pre = dummy; <span class="cmt">// node just before the reversal zone</span>
+
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; left - <span class="num">1</span>; i++) pre = pre.next;
+
+    <span class="type">ListNode</span> curr = pre.next; <span class="cmt">// first node in the reversal zone</span>
+    <span class="type">ListNode</span> prev = <span class="kw">null</span>;
+
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; right - left + <span class="num">1</span>; i++) {
+        <span class="type">ListNode</span> next = curr.next;
+        curr.next = prev;
+        prev = curr;
+        curr = next;
+    }
+    <span class="cmt">// Reconnect: pre.next is still the old first node of the segment</span>
+    pre.next.next = curr; <span class="cmt">// old first → node after reversal zone</span>
+    pre.next = prev;      <span class="cmt">// pre → new first (old last of segment)</span>
+
+    <span class="kw">return</span> dummy.next;
+}
+<span class="cmt">// Common mistakes: miscounting iterations, reconnecting in wrong order.</span>
+<span class="cmt">// pre.next.next = curr must come BEFORE pre.next = prev</span>
+<span class="cmt">// (otherwise pre.next is already overwritten to prev, losing the tail connection)</span></code></pre>
+
+    <h3>B — Fast &amp; Slow Pointer Patterns</h3>
+
+    <h4>Cycle Detection (Floyd's Algorithm)</h4>
+    <p>If <code>fast</code> and <code>slow</code> meet, there's a cycle. If <code>fast</code> reaches null, there's no cycle.</p>
+
+<pre><code><span class="kw">boolean</span> <span class="fn">hasCycle</span>(<span class="type">ListNode</span> head) {
+    <span class="type">ListNode</span> slow = head, fast = head;
+    <span class="kw">while</span> (fast != <span class="kw">null</span> &amp;&amp; fast.next != <span class="kw">null</span>) {
+        slow = slow.next;
+        fast = fast.next.next;
+        <span class="kw">if</span> (slow == fast) <span class="kw">return</span> <span class="kw">true</span>; <span class="cmt">// met — cycle exists</span>
+    }
+    <span class="kw">return</span> <span class="kw">false</span>; <span class="cmt">// fast reached null — no cycle</span>
+}</code></pre>
+
+    <h4>Find Cycle Start (LeetCode 142)</h4>
+    <p>After detecting meeting point: reset <code>slow</code> to head, keep <code>fast</code> at meeting point. Move both one step at a time. They meet exactly at the cycle start. This is a mathematical property of Floyd's algorithm — take it as given in interviews.</p>
+
+<pre><code><span class="type">ListNode</span> <span class="fn">detectCycleStart</span>(<span class="type">ListNode</span> head) {
+    <span class="type">ListNode</span> slow = head, fast = head;
+    <span class="kw">while</span> (fast != <span class="kw">null</span> &amp;&amp; fast.next != <span class="kw">null</span>) {
+        slow = slow.next; fast = fast.next.next;
+        <span class="kw">if</span> (slow == fast) { <span class="cmt">// cycle detected</span>
+            slow = head;    <span class="cmt">// reset slow to head</span>
+            <span class="kw">while</span> (slow != fast) { <span class="cmt">// both move 1 step</span>
+                slow = slow.next; fast = fast.next;
+            }
+            <span class="kw">return</span> slow; <span class="cmt">// cycle start</span>
+        }
+    }
+    <span class="kw">return</span> <span class="kw">null</span>;
+}</code></pre>
+
+    <h4>Find Middle of Linked List</h4>
+    <p>When <code>fast</code> reaches end, <code>slow</code> is at the middle. For even-length lists, <code>slow</code> lands at the <em>second</em> middle node.</p>
+
+<pre><code><span class="type">ListNode</span> <span class="fn">findMiddle</span>(<span class="type">ListNode</span> head) {
+    <span class="type">ListNode</span> slow = head, fast = head;
+    <span class="kw">while</span> (fast != <span class="kw">null</span> &amp;&amp; fast.next != <span class="kw">null</span>) {
+        slow = slow.next;
+        fast = fast.next.next;
+    }
+    <span class="kw">return</span> slow; <span class="cmt">// middle node</span>
+}
+<span class="cmt">// For first middle node of even list: use fast.next != null as only condition.</span></code></pre>
+
+    <h3>C — Merge Two Sorted Lists</h3>
+    <p>Two-pointer approach: maintain a pointer to the current tail of the merged list. At each step, attach whichever of the two current nodes is smaller.</p>
+
+<pre><code><span class="type">ListNode</span> <span class="fn">mergeTwoLists</span>(<span class="type">ListNode</span> l1, <span class="type">ListNode</span> l2) {
+    <span class="type">ListNode</span> dummy = <span class="kw">new</span> <span class="type">ListNode</span>(<span class="num">0</span>);
+    <span class="type">ListNode</span> curr = dummy;
+
+    <span class="kw">while</span> (l1 != <span class="kw">null</span> &amp;&amp; l2 != <span class="kw">null</span>) {
+        <span class="kw">if</span> (l1.val &lt;= l2.val) {
+            curr.next = l1;   <span class="cmt">// attach smaller node</span>
+            l1 = l1.next;     <span class="cmt">// advance l1</span>
+        } <span class="kw">else</span> {
+            curr.next = l2;
+            l2 = l2.next;
+        }
+        curr = curr.next;     <span class="cmt">// advance merged tail</span>
+    }
+    curr.next = (l1 != <span class="kw">null</span>) ? l1 : l2; <span class="cmt">// attach remaining list</span>
+    <span class="kw">return</span> dummy.next;
+}
+<span class="cmt">// Key insight: the remaining list is already sorted — just attach it.</span>
+<span class="cmt">// Common mistake: not handling when one list is exhausted before the other.</span></code></pre>
+
+    <h3>D — K-way Merge (Min-Heap)</h3>
+    <p>Given K sorted linked lists, merge into one sorted list. Naively merging pairwise is O(nK log K). The optimal approach uses a min-heap (priority queue).</p>
+    <p><strong>Approach:</strong> Insert the head of each list into a min-heap. Repeatedly extract the minimum node, attach it to the result, then insert that node's <code>next</code> into the heap.</p>
+
+<pre><code><span class="type">ListNode</span> <span class="fn">mergeKLists</span>(<span class="type">ListNode</span>[] lists) {
+    <span class="type">PriorityQueue</span>&lt;<span class="type">ListNode</span>&gt; pq = <span class="kw">new</span> <span class="type">PriorityQueue</span>&lt;&gt;(
+        (a, b) -&gt; a.val - b.val <span class="cmt">// min-heap by node value</span>
+    );
+    <span class="kw">for</span> (<span class="type">ListNode</span> node : lists) {
+        <span class="kw">if</span> (node != <span class="kw">null</span>) pq.offer(node); <span class="cmt">// seed with each list's head</span>
+    }
+    <span class="type">ListNode</span> dummy = <span class="kw">new</span> <span class="type">ListNode</span>(<span class="num">0</span>);
+    <span class="type">ListNode</span> curr = dummy;
+
+    <span class="kw">while</span> (!pq.isEmpty()) {
+        <span class="type">ListNode</span> min = pq.poll();  <span class="cmt">// extract minimum</span>
+        curr.next = min;
+        curr = curr.next;
+        <span class="kw">if</span> (min.next != <span class="kw">null</span>) pq.offer(min.next); <span class="cmt">// push next into heap</span>
+    }
+    <span class="kw">return</span> dummy.next;
+}
+<span class="cmt">// Time: O(n log K) where n = total nodes, K = number of lists</span>
+<span class="cmt">// Space: O(K) for the heap</span></code></pre>
+
+    <h3>E — Palindrome Linked List</h3>
+    <p>Classic compound problem using three sub-techniques: find middle → reverse second half → compare both halves.</p>
+
+<pre><code><span class="kw">boolean</span> <span class="fn">isPalindrome</span>(<span class="type">ListNode</span> head) {
+    <span class="cmt">// Step 1: Find middle</span>
+    <span class="type">ListNode</span> slow = head, fast = head;
+    <span class="kw">while</span> (fast != <span class="kw">null</span> &amp;&amp; fast.next != <span class="kw">null</span>) {
+        slow = slow.next; fast = fast.next.next;
+    }
+
+    <span class="cmt">// Step 2: Reverse second half</span>
+    <span class="type">ListNode</span> prev = <span class="kw">null</span>, curr = slow;
+    <span class="kw">while</span> (curr != <span class="kw">null</span>) {
+        <span class="type">ListNode</span> next = curr.next;
+        curr.next = prev; prev = curr; curr = next;
+    }
+
+    <span class="cmt">// Step 3: Compare first and reversed second half</span>
+    <span class="type">ListNode</span> left = head, right = prev;
+    <span class="kw">while</span> (right != <span class="kw">null</span>) { <span class="cmt">// right is shorter or equal length</span>
+        <span class="kw">if</span> (left.val != right.val) <span class="kw">return</span> <span class="kw">false</span>;
+        left = left.next; right = right.next;
+    }
+    <span class="kw">return</span> <span class="kw">true</span>;
+}
+<span class="cmt">// This modifies the list. Restore if required by the problem.</span></code></pre>
+
+    <h3>F — Reorder List</h3>
+    <p>Given 1→2→3→4→5, reorder to 1→5→2→4→3. Strategy: find middle → reverse second half → interleave the two halves.</p>
+
+<pre><code><span class="kw">void</span> <span class="fn">reorderList</span>(<span class="type">ListNode</span> head) {
+    <span class="kw">if</span> (head == <span class="kw">null</span> || head.next == <span class="kw">null</span>) <span class="kw">return</span>;
+
+    <span class="cmt">// 1. Find middle</span>
+    <span class="type">ListNode</span> slow = head, fast = head;
+    <span class="kw">while</span> (fast.next != <span class="kw">null</span> &amp;&amp; fast.next.next != <span class="kw">null</span>) {
+        slow = slow.next; fast = fast.next.next;
+    }
+
+    <span class="cmt">// 2. Reverse second half</span>
+    <span class="type">ListNode</span> second = slow.next;
+    slow.next = <span class="kw">null</span>; <span class="cmt">// sever first half from second</span>
+    <span class="type">ListNode</span> prev = <span class="kw">null</span>;
+    <span class="kw">while</span> (second != <span class="kw">null</span>) {
+        <span class="type">ListNode</span> next = second.next;
+        second.next = prev; prev = second; second = next;
+    }
+
+    <span class="cmt">// 3. Interleave first half and reversed second half</span>
+    <span class="type">ListNode</span> first = head;
+    second = prev; <span class="cmt">// now head of reversed second half</span>
+    <span class="kw">while</span> (second != <span class="kw">null</span>) {
+        <span class="type">ListNode</span> tmp1 = first.next, tmp2 = second.next;
+        first.next = second;
+        second.next = tmp1;
+        first = tmp1; second = tmp2;
+    }
+}</code></pre>
+
+    <h3>G — Intersection of Two Linked Lists</h3>
+    <p>Two lists that share a tail (converge at a node). Find the intersection node.</p>
+    <p><strong>Insight:</strong> If you traverse both lists and when you hit the end of one, continue from the head of the other — after at most two traversals, both pointers will have traveled the same total distance and will meet at the intersection node (or both reach null simultaneously if no intersection).</p>
+
+<pre><code><span class="type">ListNode</span> <span class="fn">getIntersectionNode</span>(<span class="type">ListNode</span> headA, <span class="type">ListNode</span> headB) {
+    <span class="type">ListNode</span> a = headA, b = headB;
+    <span class="kw">while</span> (a != b) {           <span class="cmt">// continue until they meet (or both null)</span>
+        a = (a == <span class="kw">null</span>) ? headB : a.next; <span class="cmt">// switch to other list at end</span>
+        b = (b == <span class="kw">null</span>) ? headA : b.next;
+    }
+    <span class="kw">return</span> a; <span class="cmt">// intersection node, or null if no intersection</span>
+}
+<span class="cmt">// Elegant — no length calculation needed.</span>
+<span class="cmt">// Both pointers travel: lenA + lenB total steps before meeting.</span></code></pre>
+
+  </div><!-- /part4 -->
+  <hr class="section-divider">
+
+
+  <!-- ═══════════════════════════════════════════════
+       TEMPLATES
+  ═══════════════════════════════════════════════ -->
+  <div class="section" id="templates">
+    <div class="section-header">
+      <span class="section-num">TEMPLATES</span>
+      <h2>Java Code Templates</h2>
+    </div>
+
+    <h3>ListNode Class</h3>
+<pre><code><span class="cmt">// Standard ListNode — the building block of all linked list problems</span>
+<span class="kw">class</span> <span class="type">ListNode</span> {
+    <span class="kw">int</span> val;
+    <span class="type">ListNode</span> next;
+
+    <span class="type">ListNode</span>() {}
+
+    <span class="type">ListNode</span>(<span class="kw">int</span> val) {
+        <span class="kw">this</span>.val = val; <span class="cmt">// next defaults to null automatically</span>
+    }
+
+    <span class="type">ListNode</span>(<span class="kw">int</span> val, <span class="type">ListNode</span> next) {
+        <span class="kw">this</span>.val = val;
+        <span class="kw">this</span>.next = next;
+    }
+}
+<span class="cmt">// Doubly linked list node:</span>
+<span class="kw">class</span> <span class="type">DListNode</span> {
+    <span class="kw">int</span> val;
+    <span class="type">DListNode</span> prev, next;
+    <span class="type">DListNode</span>(<span class="kw">int</span> val) { <span class="kw">this</span>.val = val; }
+}
+<span class="cmt">// Common mistake: forgetting that next is null by default.</span>
+<span class="cmt">// You only set next explicitly when linking to another node.</span></code></pre>
+
+    <h3>Reversal Template</h3>
+<pre><code><span class="cmt">// Iterative reversal — reusable in any problem</span>
+<span class="type">ListNode</span> <span class="fn">reverse</span>(<span class="type">ListNode</span> head) {
+    <span class="type">ListNode</span> prev = <span class="kw">null</span>;  <span class="cmt">// ① will become new tail (points to null)</span>
+    <span class="type">ListNode</span> curr = head;  <span class="cmt">// ② current node being processed</span>
+
+    <span class="kw">while</span> (curr != <span class="kw">null</span>) {
+        <span class="type">ListNode</span> next = curr.next; <span class="cmt">// SAVE: don't lose the rest of list</span>
+        curr.next = prev;          <span class="cmt">// FLIP: point backward</span>
+        prev = curr;               <span class="cmt">// ADVANCE: prev moves forward</span>
+        curr = next;               <span class="cmt">// ADVANCE: curr uses saved reference</span>
+    }
+    <span class="kw">return</span> prev; <span class="cmt">// ③ prev is new head; curr is null (past the end)</span>
+}
+<span class="cmt">// Common mistakes:</span>
+<span class="cmt">// 1. Returning curr instead of prev</span>
+<span class="cmt">// 2. Forgetting to save next before overwriting curr.next</span>
+<span class="cmt">// 3. Starting prev = head instead of prev = null</span></code></pre>
+
+    <h3>Fast &amp; Slow Pointer Template</h3>
+<pre><code><span class="cmt">// Core template — adapt for your specific problem</span>
+<span class="type">ListNode</span> slow = head;
+<span class="type">ListNode</span> fast = head;
+
+<span class="cmt">// Variant A: Find middle (fast reaches null when slow is at middle)</span>
+<span class="kw">while</span> (fast != <span class="kw">null</span> &amp;&amp; fast.next != <span class="kw">null</span>) {
+    slow = slow.next;
+    fast = fast.next.next;
+}
+<span class="cmt">// slow is at middle</span>
+
+<span class="cmt">// Variant B: Cycle detection (check equality before advancing)</span>
+<span class="kw">while</span> (fast != <span class="kw">null</span> &amp;&amp; fast.next != <span class="kw">null</span>) {
+    slow = slow.next;
+    fast = fast.next.next;
+    <span class="kw">if</span> (slow == fast) { <span class="cmt">/* cycle found */</span> }
+}
+
+<span class="cmt">// Variant C: N steps ahead gap (for Nth from end)</span>
+<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++) fast = fast.next;
+<span class="kw">while</span> (fast != <span class="kw">null</span>) { slow = slow.next; fast = fast.next; }
+<span class="cmt">// slow is now at Nth from end</span>
+
+<span class="cmt">// Critical: ALWAYS check both fast != null AND fast.next != null</span>
+<span class="cmt">// Checking only fast != null causes NPE when accessing fast.next.next</span></code></pre>
+
+    <h3>Merge Two Lists Template</h3>
+<pre><code><span class="cmt">// Reusable merge — always use a dummy node</span>
+<span class="type">ListNode</span> <span class="fn">merge</span>(<span class="type">ListNode</span> l1, <span class="type">ListNode</span> l2) {
+    <span class="type">ListNode</span> dummy = <span class="kw">new</span> <span class="type">ListNode</span>(<span class="num">0</span>); <span class="cmt">// ① dummy: avoids head special case</span>
+    <span class="type">ListNode</span> tail = dummy;          <span class="cmt">// ② tail: always points to end of merged list</span>
+
+    <span class="kw">while</span> (l1 != <span class="kw">null</span> &amp;&amp; l2 != <span class="kw">null</span>) {
+        <span class="kw">if</span> (l1.val &lt;= l2.val) {    <span class="cmt">// ③ pick smaller</span>
+            tail.next = l1;
+            l1 = l1.next;
+        } <span class="kw">else</span> {
+            tail.next = l2;
+            l2 = l2.next;
+        }
+        tail = tail.next;            <span class="cmt">// ④ always advance tail</span>
+    }
+    tail.next = (l1 != <span class="kw">null</span>) ? l1 : l2; <span class="cmt">// ⑤ attach remaining</span>
+    <span class="kw">return</span> dummy.next;               <span class="cmt">// ⑥ skip the dummy</span>
+}
+<span class="cmt">// Common mistakes:</span>
+<span class="cmt">// 1. Forgetting to advance tail after each attachment</span>
+<span class="cmt">// 2. Forgetting to attach the remaining non-null list at the end</span>
+<span class="cmt">// 3. Using head instead of dummy — causes special-case logic for empty merge</span></code></pre>
+
+  </div><!-- /templates -->
+  <hr class="section-divider">
+
+
+  <!-- ═══════════════════════════════════════════════
+       EDGE CASES
+  ═══════════════════════════════════════════════ -->
+  <div class="section" id="edge">
+    <div class="section-header">
+      <span class="section-num">EDGE CASES</span>
+      <h2>Edge Cases &amp; Pitfalls</h2>
+    </div>
+
+    <p>Test every linked list solution against these cases before finalizing. Most bugs hide here.</p>
+
+    <div class="edge-case">
+      <div class="edge-icon">!</div>
+      <div class="edge-text"><strong>Empty list (head == null).</strong> Almost every function needs an upfront null check. <code>if (head == null) return null;</code> or <code>if (head == null) return;</code>. Forgetting this causes NPE before you even start.</div>
+    </div>
+
+    <div class="edge-case">
+      <div class="edge-icon">!</div>
+      <div class="edge-text"><strong>Single node list.</strong> Many patterns break here. Reversal of one node: should return the same node, not null. Fast &amp; slow: fast is already at end before the loop starts. Palindrome: always true. Always dry run single-node input.</div>
+    </div>
+
+    <div class="edge-case">
+      <div class="edge-icon">!</div>
+      <div class="edge-text"><strong>Two node list.</strong> Particularly tricky for reversal and palindrome. After reversal: head should be the old second node. Palindrome of [1,2]: false. [1,1]: true. Fast pointer starts at head, after one step fast.next is null — the loop may not even execute once in certain variants.</div>
+    </div>
+
+    <div class="edge-case">
+      <div class="edge-icon">!</div>
+      <div class="edge-text"><strong>Cycle presence.</strong> If a cycle exists and your solution assumes linear traversal, it will loop infinitely. Always use Floyd's fast &amp; slow when cycle presence is uncertain, or verify cycle-free before traversal if the problem guarantees it.</div>
+    </div>
+
+    <div class="edge-case">
+      <div class="edge-icon">!</div>
+      <div class="edge-text"><strong>Updating head incorrectly after modification.</strong> After reversal, the new head is <code>prev</code>, not the original head. After deletion of the head node, you must update the head. Always use a dummy node or explicitly handle head updates when the head might change.</div>
+    </div>
+
+    <div class="edge-case">
+      <div class="edge-icon">!</div>
+      <div class="edge-text"><strong>Nth from end where N equals list length.</strong> This deletes the head. With the fast &amp; slow approach using a dummy node, this is handled correctly — <code>slow</code> remains at dummy, and <code>slow.next = slow.next.next</code> removes the head. Dry run this explicitly.</div>
+    </div>
+
+    <div class="edge-case">
+      <div class="edge-icon">!</div>
+      <div class="edge-text"><strong>Merging two lists when one is empty.</strong> <code>mergeTwoLists(null, l2)</code> should return <code>l2</code>. The dummy node + while loop naturally handles this — the while loop body never executes, and <code>tail.next = l2</code> attaches the entire second list.</div>
+    </div>
+
+    <div class="edge-case">
+      <div class="edge-icon">!</div>
+      <div class="edge-text"><strong>Losing the tail reference after reversal.</strong> In palindrome check or reorder list, after reversing the second half, the original middle node's <code>next</code> still points into the reversed portion. If you don't sever the lists before reversing (<code>slow.next = null</code>), you may create a cycle unintentionally.</div>
+    </div>
+
+    <div class="edge-case">
+      <div class="edge-icon">!</div>
+      <div class="edge-text"><strong>Even vs odd length in palindrome/middle problems.</strong> Odd length: one true middle. Even length: slow lands on the second of the two middles. Ensure your algorithm is verified against both [1,2,1] and [1,2,2,1].</div>
+    </div>
+
+  </div><!-- /edge -->
+  <hr class="section-divider">
+
+
+  <!-- ═══════════════════════════════════════════════
+       COMPARISON
+  ═══════════════════════════════════════════════ -->
+  <div class="section" id="compare">
+    <div class="section-header">
+      <span class="section-num">COMPARE</span>
+      <h2>Linked Lists vs Arrays vs Recursion vs Iteration</h2>
+    </div>
+
+    <h3>Linked Lists vs Arrays</h3>
+    <table class="compare-table">
+      <tr>
+        <th>Dimension</th>
+        <th>Array</th>
+        <th>Linked List</th>
+      </tr>
+      <tr>
+        <td><strong>Memory layout</strong></td>
+        <td class="yes">Contiguous — cache friendly</td>
+        <td class="no">Scattered — cache unfriendly</td>
+      </tr>
+      <tr>
+        <td><strong>Access by index</strong></td>
+        <td class="yes">O(1)</td>
+        <td class="no">O(n)</td>
+      </tr>
+      <tr>
+        <td><strong>Insert at head</strong></td>
+        <td class="no">O(n) — shift all</td>
+        <td class="yes">O(1)</td>
+      </tr>
+      <tr>
+        <td><strong>Delete in middle</strong></td>
+        <td class="no">O(n) — shift all</td>
+        <td class="yes">O(1) given prev pointer</td>
+      </tr>
+      <tr>
+        <td><strong>Memory per element</strong></td>
+        <td class="yes">Value only</td>
+        <td class="no">Value + 1–2 pointers</td>
+      </tr>
+      <tr>
+        <td><strong>Dynamic size</strong></td>
+        <td class="mid">ArrayList resizes (amortized)</td>
+        <td class="yes">True O(1) per insert/delete</td>
+      </tr>
+      <tr>
+        <td><strong>Two-pointer technique</strong></td>
+        <td class="yes">Direct index arithmetic</td>
+        <td class="mid">Must traverse; fast &amp; slow pointers</td>
+      </tr>
+      <tr>
+        <td><strong>Binary search</strong></td>
+        <td class="yes">O(log n)</td>
+        <td class="no">Not possible — no random access</td>
+      </tr>
+      <tr>
+        <td><strong>Reversal</strong></td>
+        <td class="yes">O(n) — simple swap with indices</td>
+        <td class="mid">O(n) — pointer rewiring, more error-prone</td>
+      </tr>
+    </table>
+
+    <h3>Two Pointers: Arrays vs Linked Lists</h3>
+    <p>Two-pointer problems look similar between arrays and linked lists, but the mechanics differ significantly.</p>
+    <ul>
+      <li><strong>Arrays:</strong> Two pointers use indices. You can jump to <code>arr[i]</code> and <code>arr[j]</code> instantly. Can move backward. Partitioning and sorting leverage random access.</li>
+      <li><strong>Linked Lists:</strong> Two pointers move by following <code>next</code>. No random access. Cannot move backward (singly). Fast &amp; slow exploit the speed difference. You cannot "skip back" — plan ahead.</li>
+    </ul>
+
+    <div class="callout info">
+      <div class="callout-title">When Linked Lists Win</div>
+      <strong>Frequent insertions/deletions</strong> in the middle of a large collection. <strong>LRU cache</strong> (O(1) delete of any node). <strong>Queues and deques</strong> built from scratch. <strong>When you never need random access</strong>. Any situation where shifting elements in an array would dominate runtime.
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-title">When Arrays Win</div>
+      <strong>Any problem requiring index access</strong>. <strong>Binary search</strong>. <strong>Sorting</strong> (most algorithms work on arrays). <strong>Cache performance matters</strong> (tight loop over millions of elements). <strong>Two-pointer with backward movement</strong>. If in doubt, reach for the array — linked lists have constant-factor overhead.
+    </div>
+
+    <h3>Recursion vs Iteration in Linked Lists</h3>
+    <table class="compare-table">
+      <tr>
+        <th>Dimension</th>
+        <th>Recursive</th>
+        <th>Iterative</th>
+      </tr>
+      <tr>
+        <td><strong>Reversal clarity</strong></td>
+        <td class="mid">Elegant but non-obvious</td>
+        <td class="yes">Mechanical and clear</td>
+      </tr>
+      <tr>
+        <td><strong>Space complexity</strong></td>
+        <td class="no">O(n) call stack</td>
+        <td class="yes">O(1)</td>
+      </tr>
+      <tr>
+        <td><strong>Stack overflow risk</strong></td>
+        <td class="no">Yes — large lists crash</td>
+        <td class="yes">No</td>
+      </tr>
+      <tr>
+        <td><strong>Forward processing</strong></td>
+        <td class="mid">Natural but uses O(n) stack</td>
+        <td class="yes">Natural, O(1) space</td>
+      </tr>
+      <tr>
+        <td><strong>Backward processing</strong></td>
+        <td class="yes">Natural — unwind stack after recursion</td>
+        <td class="no">Need explicit stack or reversal first</td>
+      </tr>
+      <tr>
+        <td><strong>Interview preference</strong></td>
+        <td class="mid">Show if asked, or for elegance</td>
+        <td class="yes">Preferred for production correctness</td>
+      </tr>
+    </table>
+
+    <div class="callout success">
+      <div class="callout-title">The One Case for Recursion in Linked Lists</div>
+      When you need to process a linked list <strong>in reverse order</strong> without first reversing it. For example, printing values from tail to head, or comparing a list against itself from both ends simultaneously. Recursion unwinds from the tail naturally — an iterative approach would require an explicit stack or prior reversal.
+    </div>
+
+  </div><!-- /compare -->
+  <hr class="section-divider">
+
+
+  <!-- ═══════════════════════════════════════════════
+       PROBLEMS
+  ═══════════════════════════════════════════════ -->
+  <div class="section" id="problems">
+    <div class="section-header">
+      <span class="section-num">PROBLEMS</span>
+      <h2>Progressive Problem Set — 38 Problems</h2>
+    </div>
+
+    <p>Problems organized from beginner to advanced. Each entry includes the pattern tag, a 1–2 line directional hint, and what makes it tricky. No full solutions — the struggle is the learning.</p>
+
+    <!-- BEGINNER -->
+    <div class="problem-section-label">Beginner — 12 Problems</div>
+
+    <div class="problem-card">
+      <div class="problem-num">#1</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/reverse-linked-list/" target="_blank">206 — Reverse Linked List</a></span>
+          <span class="badge easy">Easy</span>
+          <span class="badge pattern">Reversal · Iterative</span>
+        </div>
+        <div class="problem-hint">Classic three-pointer iterative reversal. Start with prev=null, curr=head. Save next, flip link, advance both.</div>
+        <div class="problem-tricky">The #1 linked list problem. Must know cold. Returning curr (null) instead of prev is the single most common mistake. Try recursive version too.</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#2</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/middle-of-the-linked-list/" target="_blank">876 — Middle of the Linked List</a></span>
+          <span class="badge easy">Easy</span>
+          <span class="badge pattern">Fast &amp; Slow</span>
+        </div>
+        <div class="problem-hint">Fast &amp; slow pointers. When fast reaches the end, slow is at the middle.</div>
+        <div class="problem-tricky">For even-length lists, slow lands on the second middle. The problem specifies which one you need — read carefully. Subtle difference in while condition: <code>fast.next != null</code> vs <code>fast != null</code>.</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#3</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/linked-list-cycle/" target="_blank">141 — Linked List Cycle</a></span>
+          <span class="badge easy">Easy</span>
+          <span class="badge pattern">Fast &amp; Slow · Cycle</span>
+        </div>
+        <div class="problem-hint">Fast and slow. If they ever point to the same node, there's a cycle. If fast reaches null, no cycle.</div>
+        <div class="problem-tricky">Must check both <code>fast != null AND fast.next != null</code> before the step. Just one check causes NPE. Also — why does Floyd's algorithm work? Think about it. The answer builds intuition for LeetCode 142.</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#4</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/merge-two-sorted-lists/" target="_blank">21 — Merge Two Sorted Lists</a></span>
+          <span class="badge easy">Easy</span>
+          <span class="badge pattern">Merge · Dummy Node</span>
+        </div>
+        <div class="problem-hint">Use a dummy node and a tail pointer. At each step pick the smaller head node, attach it, advance the corresponding pointer.</div>
+        <div class="problem-tricky">Not attaching the remaining non-exhausted list at the end is the most common oversight. Try both iterative and recursive — the recursive solution is beautifully concise.</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#5</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/remove-duplicates-from-sorted-list/" target="_blank">83 — Remove Duplicates from Sorted List</a></span>
+          <span class="badge easy">Easy</span>
+          <span class="badge pattern">Traversal · Pointer Skip</span>
+        </div>
+        <div class="problem-hint">Traverse and skip nodes where <code>curr.val == curr.next.val</code>. No dummy node needed since the head is never removed.</div>
+        <div class="problem-tricky">Not advancing curr correctly when consecutive duplicates exist (e.g., 1→1→1). Must keep pointing curr.next until a different value appears.</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#6</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/delete-node-in-a-linked-list/" target="_blank">237 — Delete Node in a Linked List</a></span>
+          <span class="badge medium">Medium</span>
+          <span class="badge pattern">Pointer Trick</span>
+        </div>
+        <div class="problem-hint">You're not given the head — only the node to delete. Copy the next node's value into this node, then skip the next node.</div>
+        <div class="problem-tricky">Forces you to rethink what "deleting a node" means. The trick: node.val = node.next.val; node.next = node.next.next. Only works because the node is guaranteed not to be the tail.</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#7</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/remove-linked-list-elements/" target="_blank">203 — Remove Linked List Elements</a></span>
+          <span class="badge easy">Easy</span>
+          <span class="badge pattern">Traversal · Dummy Node</span>
+        </div>
+        <div class="problem-hint">Use a dummy node before head. Traverse with prev pointer. When prev.next.val matches target, skip it.</div>
+        <div class="problem-tricky">Without a dummy node, you'd need to special-case removing the head. The dummy node eliminates that. Great intro problem for the dummy node pattern.</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#8</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/reverse-linked-list-ii/" target="_blank">92 — Reverse Linked List II</a></span>
+          <span class="badge medium">Medium</span>
+          <span class="badge pattern">Partial Reversal</span>
+        </div>
+        <div class="problem-hint">Find the node before position left. Run the standard reversal exactly (right-left+1) times. Reconnect: pre.next.next = curr, pre.next = prev.</div>
+        <div class="problem-tricky">The reconnection order matters: set pre.next.next BEFORE pre.next. If you reverse the assignment order, you lose the reference to curr. One of the trickier pointer problems.</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#9</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/linked-list-cycle-ii/" target="_blank">142 — Linked List Cycle II</a></span>
+          <span class="badge medium">Medium</span>
+          <span class="badge pattern">Fast &amp; Slow · Cycle Start</span>
+        </div>
+        <div class="problem-hint">Detect cycle with fast &amp; slow. Then reset slow to head, keep fast at meeting point. Move both by 1 step — they meet at cycle start.</div>
+        <div class="problem-tricky">The "reset slow to head" step feels magical without the math. Understanding why this works (distance properties of Floyd's) is a great interview talking point. The interviewer almost always asks why.</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#10</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/remove-nth-node-from-end-of-list/" target="_blank">19 — Remove Nth Node From End of List</a></span>
+          <span class="badge medium">Medium</span>
+          <span class="badge pattern">Fast &amp; Slow · Gap</span>
+        </div>
+        <div class="problem-hint">Dummy node + fast &amp; slow with a gap of N+1 (not N) steps. When fast is null, slow is at the node before the target.</div>
+        <div class="problem-tricky">The gap is N+1, not N — you need slow to be at the predecessor of the node to delete. Using N steps instead stops slow at the target itself. Also handles the case where N equals list length (removes head).</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#11</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/intersection-of-two-linked-lists/" target="_blank">160 — Intersection of Two Linked Lists</a></span>
+          <span class="badge easy">Easy</span>
+          <span class="badge pattern">Two Pointer · Cycle Switch</span>
+        </div>
+        <div class="problem-hint">Two pointers that switch to the other list's head when they hit null. They'll meet at the intersection after equal total traversal distance.</div>
+        <div class="problem-tricky">Why it works: both pointers travel lenA + lenB total steps. If there's an intersection, they meet at it. If not, both reach null simultaneously. The key insight: equal total distance, not equal step count.</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#12</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/palindrome-linked-list/" target="_blank">234 — Palindrome Linked List</a></span>
+          <span class="badge easy">Easy</span>
+          <span class="badge pattern">Fast &amp; Slow · Reversal · Compare</span>
+        </div>
+        <div class="problem-hint">Find middle with fast &amp; slow. Reverse second half in-place. Compare first half with reversed second half node by node.</div>
+        <div class="problem-tricky">A compound problem testing three techniques. Tricky parts: even vs odd length handling, severing the list at the midpoint before reversal, and iterating until right (reversed half) is null — not left.</div>
+      </div>
+    </div>
+
+    <!-- INTERMEDIATE -->
+    <div class="problem-section-label">Intermediate — 14 Problems</div>
+
+    <div class="problem-card">
+      <div class="problem-num">#13</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/reorder-list/" target="_blank">143 — Reorder List</a></span>
+          <span class="badge medium">Medium</span>
+          <span class="badge pattern">Find Middle · Reverse · Interleave</span>
+        </div>
+        <div class="problem-hint">Three steps: find middle, reverse second half, interleave the two halves by alternating nodes.</div>
+        <div class="problem-tricky">The interleaving step requires careful pointer juggling (four pointers at once). Must sever the two halves before reversing (slow.next = null). The most coordination-heavy pattern on this list.</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#14</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/remove-duplicates-from-sorted-list-ii/" target="_blank">82 — Remove Duplicates from Sorted List II</a></span>
+          <span class="badge medium">Medium</span>
+          <span class="badge pattern">Dummy Node · Two Pointer Skip</span>
+        </div>
+        <div class="problem-hint">Use a dummy node. Track prev. If curr.val == curr.next.val, skip ALL nodes with that value — not just one.</div>
+        <div class="problem-tricky">Must skip every node with a duplicate value, including the first occurrence (unlike LeetCode 83). Need a flag or inner while loop to consume all duplicates before reconnecting prev.</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#15</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/add-two-numbers/" target="_blank">2 — Add Two Numbers</a></span>
+          <span class="badge medium">Medium</span>
+          <span class="badge pattern">Traversal · Carry Simulation</span>
+        </div>
+        <div class="problem-hint">Traverse both lists simultaneously. At each step: sum = l1.val + l2.val + carry. New node value = sum % 10. carry = sum / 10.</div>
+        <div class="problem-tricky">Three edge cases: lists of different lengths, carry remaining after both lists are exhausted (must create one more node), and initializing carry=0 correctly.</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#16</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/partition-list/" target="_blank">86 — Partition List</a></span>
+          <span class="badge medium">Medium</span>
+          <span class="badge pattern">Two Dummy Lists · Split &amp; Join</span>
+        </div>
+        <div class="problem-hint">Create two dummy-headed lists: one for nodes less than x, one for nodes ≥ x. Traverse once, appending each node to the appropriate list. Join the two lists.</div>
+        <div class="problem-tricky">Must null-terminate the "greater" list before joining — otherwise the tail of the greater list may still point to something in the original list, creating a cycle.</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#17</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/rotate-list/" target="_blank">61 — Rotate List</a></span>
+          <span class="badge medium">Medium</span>
+          <span class="badge pattern">Length + Modulo + Circular</span>
+        </div>
+        <div class="problem-hint">Find list length, compute effective rotation k = k % length. Make it circular, find new tail at position (length - k), break the circle there.</div>
+        <div class="problem-tricky">k can be larger than the list length — must take modulo first. New head is at position (length - k + 1). Off-by-one in finding the new tail is very common.</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#18</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/copy-list-with-random-pointer/" target="_blank">138 — Copy List with Random Pointer</a></span>
+          <span class="badge medium">Medium</span>
+          <span class="badge pattern">HashMap · Clone</span>
+        </div>
+        <div class="problem-hint">Two-pass with HashMap: first create all cloned nodes, second assign next and random pointers using the map.</div>
+        <div class="problem-tricky">The random pointer can point to any node including null or the node itself — handle null explicitly. Also solvable without extra space by interleaving cloned nodes, but that's harder to implement correctly.</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#19</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/swap-nodes-in-pairs/" target="_blank">24 — Swap Nodes in Pairs</a></span>
+          <span class="badge medium">Medium</span>
+          <span class="badge pattern">Dummy Node · Pair Swap</span>
+        </div>
+        <div class="problem-hint">Use a dummy node. For each pair: save pointers, rewire the pair to swap them, advance by 2 nodes. Repeat.</div>
+        <div class="problem-tricky">Four pointers involved in each swap (prev, first, second, next). Updating them in the wrong order loses reference to the next pair. Good exercise in disciplined pointer sequencing.</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#20</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/sort-list/" target="_blank">148 — Sort List</a></span>
+          <span class="badge medium">Medium</span>
+          <span class="badge pattern">Merge Sort · Find Middle</span>
+        </div>
+        <div class="problem-hint">Merge sort on linked lists: find middle, split, recursively sort each half, merge the two sorted halves.</div>
+        <div class="problem-tricky">Finding the middle correctly with fast &amp; slow is critical — must use the "first middle" variant (while fast.next.next != null) to avoid infinite recursion. Merge sort is the natural O(n log n) sort for linked lists (no random access needed).</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#21</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/odd-even-linked-list/" target="_blank">328 — Odd Even Linked List</a></span>
+          <span class="badge medium">Medium</span>
+          <span class="badge pattern">Two Pointer · Reorder</span>
+        </div>
+        <div class="problem-hint">Maintain two separate pointers: one for odd-indexed nodes, one for even-indexed nodes. Weave them through the list, then join odd tail to even head.</div>
+        <div class="problem-tricky">Must save the even head before modifying pointers. Null checks for even and even.next are critical (odd-length lists). The indices are 1-based positions, not values.</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#22</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/add-two-numbers-ii/" target="_blank">445 — Add Two Numbers II</a></span>
+          <span class="badge medium">Medium</span>
+          <span class="badge pattern">Stack · Reverse Traversal</span>
+        </div>
+        <div class="problem-hint">Use stacks to process from least significant digit. Pop from both stacks, compute sum + carry, build result in reverse.</div>
+        <div class="problem-tricky">Lists are not reversed — digits are in natural order (most significant first). Stacks give you access to the tail first. Alternatively, reverse both lists, add, then reverse result — but stacks are cleaner.</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#23</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/flatten-a-multilevel-doubly-linked-list/" target="_blank">430 — Flatten a Multilevel Doubly Linked List</a></span>
+          <span class="badge medium">Medium</span>
+          <span class="badge pattern">DFS · Doubly Linked</span>
+        </div>
+        <div class="problem-hint">Iterative DFS: when a node has a child, insert the child's entire chain between the current node and its next. Use a stack or pointer-based approach.</div>
+        <div class="problem-tricky">Must update prev pointers (doubly linked). Must find the tail of the child chain before reconnecting. Setting child pointer to null after flattening. Complex multi-pointer update that breaks if done out of order.</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#24</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/swapping-nodes-in-a-linked-list/" target="_blank">1721 — Swapping Nodes in a Linked List</a></span>
+          <span class="badge medium">Medium</span>
+          <span class="badge pattern">Fast &amp; Slow · Value Swap</span>
+        </div>
+        <div class="problem-hint">Find Kth node from start with a counter. Find Kth from end using fast &amp; slow gap. Swap their values (not nodes).</div>
+        <div class="problem-tricky">Swapping values is much simpler than swapping nodes. If you try to swap actual nodes, you deal with many pointer updates. Confirming K from end alignment via the gap technique is the main challenge.</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#25</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/find-the-duplicate-number/" target="_blank">287 — Find the Duplicate Number</a></span>
+          <span class="badge medium">Medium</span>
+          <span class="badge pattern">Floyd's Cycle · Array as List</span>
+        </div>
+        <div class="problem-hint">Treat array values as next pointers (index → arr[index]). Duplicate creates a cycle. Apply Floyd's algorithm to find cycle start = duplicate.</div>
+        <div class="problem-tricky">Recognizing that an array can be modeled as a linked list with implicit pointers is a huge insight. The duplicate must be the cycle entry point. Uses exactly the same logic as LeetCode 142 — connects two seemingly unrelated problems.</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#26</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/design-linked-list/" target="_blank">707 — Design Linked List</a></span>
+          <span class="badge medium">Medium</span>
+          <span class="badge pattern">Implementation · All Operations</span>
+        </div>
+        <div class="problem-hint">Implement a singly linked list with get, addAtHead, addAtTail, addAtIndex, deleteAtIndex. Use a dummy head node and maintain a size counter.</div>
+        <div class="problem-tricky">Edge cases are everywhere: index out of bounds, inserting at 0 (before head), deleting at size-1 (tail). Using a dummy node plus size counter is the cleanest approach. Great holistic practice problem.</div>
+      </div>
+    </div>
+
+    <!-- ADVANCED -->
+    <div class="problem-section-label">Advanced — 12 Problems</div>
+
+    <div class="problem-card">
+      <div class="problem-num">#27</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/merge-k-sorted-lists/" target="_blank">23 — Merge K Sorted Lists</a></span>
+          <span class="badge hard">Hard</span>
+          <span class="badge pattern">K-way Merge · Min-Heap</span>
+        </div>
+        <div class="problem-hint">Use a PriorityQueue (min-heap). Seed with each list's head. Repeatedly extract min, attach to result, push that node's next into heap.</div>
+        <div class="problem-tricky">Null-checking before adding to heap. The comparator must handle node comparison correctly. Divide-and-conquer (pairwise merge) is an alternative O(n log K) approach without a heap — know both.</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#28</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/reverse-nodes-in-k-group/" target="_blank">25 — Reverse Nodes in K-Group</a></span>
+          <span class="badge hard">Hard</span>
+          <span class="badge pattern">Partial Reversal · K-Group</span>
+        </div>
+        <div class="problem-hint">Check if K nodes remain. If yes, reverse exactly K nodes. Reconnect and recurse/iterate for the next group.</div>
+        <div class="problem-tricky">The hardest pure linked list pointer problem. You need to: check K nodes exist, reverse exactly K, reconnect to the result of the next group. The recursive version is cleaner but O(n/K) stack space. Iterative needs careful tracking of group boundaries.</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#29</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/lru-cache/" target="_blank">146 — LRU Cache</a></span>
+          <span class="badge medium">Medium</span>
+          <span class="badge pattern">Doubly Linked List · HashMap</span>
+        </div>
+        <div class="problem-hint">Combine a HashMap (O(1) lookup) with a doubly linked list (O(1) delete and insert at ends). Most-recently-used at head, least-recently-used at tail.</div>
+        <div class="problem-tricky">O(1) delete of an arbitrary node requires doubly linked list. Must update the HashMap every time a node moves. The dummy head and tail sentinels eliminate edge cases for empty list, single element. Classic system design + DS problem.</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#30</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/reverse-nodes-in-even-length-groups/" target="_blank">2074 — Reverse Nodes in Even Length Groups</a></span>
+          <span class="badge medium">Medium</span>
+          <span class="badge pattern">Partial Reversal · Variable Groups</span>
+        </div>
+        <div class="problem-hint">Groups have sizes 1, 2, 3, ... but the last group may be shorter. Reverse groups whose actual size is even. Track group boundaries carefully.</div>
+        <div class="problem-tricky">The actual size of the last group is min(expected_size, remaining_nodes). Whether to reverse depends on actual, not expected size. Tricky bookkeeping of where each group starts and ends.</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#31</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/split-linked-list-in-parts/" target="_blank">725 — Split Linked List in Parts</a></span>
+          <span class="badge medium">Medium</span>
+          <span class="badge pattern">Length Calculation · Splitting</span>
+        </div>
+        <div class="problem-hint">Find total length. Each part has size length/k, and the first (length % k) parts get one extra node. Iterate and cut the list into parts.</div>
+        <div class="problem-tricky">Must correctly compute part sizes with the remainder distribution. Each part must be null-terminated (sever the connection between parts). Handle case where k > length (empty parts are null).</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#32</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/design-browser-history/" target="_blank">1472 — Design Browser History</a></span>
+          <span class="badge medium">Medium</span>
+          <span class="badge pattern">Doubly Linked List · Bidirectional</span>
+        </div>
+        <div class="problem-hint">Doubly linked list where each visit is a node. Current pointer tracks position. Forward and back move the pointer; visiting a new URL truncates the forward history.</div>
+        <div class="problem-tricky">Visiting a new page must cut off all forward nodes. With doubly linked list: simply set current.next = newNode. The forward chain becomes unreachable (garbage collected). Understand how doubly linked lists enable O(1) forward/back.</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#33</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/maximum-twin-sum-of-a-linked-list/" target="_blank">2130 — Maximum Twin Sum of a Linked List</a></span>
+          <span class="badge medium">Medium</span>
+          <span class="badge pattern">Find Middle · Reverse · Compare</span>
+        </div>
+        <div class="problem-hint">Find middle, reverse second half, then pair corresponding nodes from each half. Track maximum sum.</div>
+        <div class="problem-tricky">Same core pattern as palindrome check, but instead of equality you compute sums. Make sure your middle-finding returns the correct split point for even-length lists (guaranteed even in this problem).</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#34</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/insert-into-a-sorted-circular-linked-list/" target="_blank">708 — Insert into a Sorted Circular Linked List</a></span>
+          <span class="badge medium">Medium</span>
+          <span class="badge pattern">Circular · Edge Cases</span>
+        </div>
+        <div class="problem-hint">Traverse the circular list. Insert at the right position by considering three cases: normal insertion, insertion at the wrap-around boundary, and insertion into a uniform list.</div>
+        <div class="problem-tricky">Three edge cases: empty list, insertion at wrap-around (val >= max or val <= min of the list), and completing a full loop without finding a spot (all values equal — insert anywhere). Missing any of these cases fails.</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#35</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/all-oone-data-structure/" target="_blank">432 — All O'one Data Structure</a></span>
+          <span class="badge hard">Hard</span>
+          <span class="badge pattern">Doubly Linked List · HashMap · O(1) All Ops</span>
+        </div>
+        <div class="problem-hint">Maintain a doubly linked list where each node represents a frequency bucket, plus two HashMaps: key→frequency, frequency→bucket node.</div>
+        <div class="problem-tricky">All four operations (inc, dec, getMaxKey, getMinKey) must be O(1). This requires combining a doubly linked list (for O(1) insert/delete of frequency buckets) with dual HashMaps. One of the hardest O(1) data structure design problems.</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#36</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/linked-list-in-binary-tree/" target="_blank">1367 — Linked List in Binary Tree</a></span>
+          <span class="badge medium">Medium</span>
+          <span class="badge pattern">DFS · Linked List + Tree</span>
+        </div>
+        <div class="problem-hint">DFS on the tree. At each tree node, attempt to match the full linked list starting from that node downward (sub-DFS for matching).</div>
+        <div class="problem-tricky">Two nested DFS calls — one to search start positions in the tree, one to match the list. The matching DFS must handle list exhaustion (success) vs tree node null (failure) correctly. Interesting fusion of two data structures.</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#37</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/convert-binary-number-in-a-linked-list-to-integer/" target="_blank">1290 — Convert Binary Number in Linked List to Integer</a></span>
+          <span class="badge easy">Easy</span>
+          <span class="badge pattern">Traversal · Bit Shift</span>
+        </div>
+        <div class="problem-hint">Traverse and maintain a running total: result = result * 2 + node.val. Or equivalently, left-shift by 1 and OR the current bit.</div>
+        <div class="problem-tricky">A deceptively clean bit-manipulation + traversal problem. Good for demonstrating bitwise operations (result = (result &lt;&lt; 1) | node.val). Confirms that traversal fundamentals compound with other domains.</div>
+      </div>
+    </div>
+
+    <div class="problem-card">
+      <div class="problem-num">#38</div>
+      <div class="problem-main">
+        <div class="problem-top">
+          <span class="problem-name"><a href="https://leetcode.com/problems/reverse-nodes-in-k-group/" target="_blank">Bonus: Reverse K-Group (recursive variant)</a></span>
+          <span class="badge hard">Hard</span>
+          <span class="badge pattern">Recursion · Partial Reversal</span>
+        </div>
+        <div class="problem-hint">Same as #28 but implement recursively: reverse K nodes, call recursively on the rest, connect the head of the recursive result to the tail of the reversed segment.</div>
+        <div class="problem-tricky">The elegance of the recursive approach hides deep pointer reasoning. The tail of the currently-reversed segment (original first K-th node) must link to the head returned by the recursive call. Draw it out before coding.</div>
+      </div>
+    </div>
+
+    <div class="callout success" style="margin-top: 2rem;">
+      <div class="callout-title">Suggested Practice Order</div>
+      Build up methodically: #1 → #2 → #3 → #4 → #7 → #5 → #10 → #11 → #12 → #6 → #8 → #9 → #19 → #21 → #15 → #14 → #13 → #16 → #17 → #20 → #22 → #24 → #18 → #23 → #26 → #25 → #29 → #30 → #31 → #27 → #28 → #38 → #32 → #33 → #34 → #35 → #36 → #37.
+    </div>
+
+  </div><!-- /problems -->
+
+  <div style="text-align: center; padding: 2rem 0; color: var(--dim); font-size: 13px; font-family: var(--font-mono);">
+    ─── Linked Lists complete ─── Stop here and await next instruction ───
+  </div>
+
+</div><!-- /page -->
+
+<script>
+  const navLinks = document.querySelectorAll('nav a');
+  const sections = document.querySelectorAll('.section, #templates, #edge, #compare');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(l => l.classList.remove('active'));
+        const id = entry.target.id;
+        const link = document.querySelector(`nav a[href="#${id}"]`);
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-10% 0px -80% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
